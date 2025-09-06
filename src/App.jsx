@@ -354,7 +354,9 @@ const App = () => {
             newEntry.recurrenceFrequency = recurrenceFrequency;
         }
 
-        setLoading(true);
+        // Changed setLoading to true only for the async operation
+        const tempLoading = true;
+        setAuthLoading(tempLoading); // Use authLoading for form submission
         setMessage(null);
 
         try {
@@ -367,7 +369,7 @@ const App = () => {
             console.error("Error adding document: ", e);
             setMessage("Failed to add entry. Please try again.");
         } finally {
-            setLoading(false);
+            setAuthLoading(false); // Reset the form loading state
         }
     };
 
@@ -376,7 +378,7 @@ const App = () => {
             setMessage("User not authenticated.");
             return;
         }
-        setLoading(true);
+        setAuthLoading(true);
         setMessage(null);
         try {
             const docRef = doc(db, `artifacts/${appId}/users/${userId}/budgetEntries/${id}`);
@@ -391,7 +393,7 @@ const App = () => {
             console.error("Error deleting document: ", e);
             setMessage("Failed to delete entry. Please try again.");
         } finally {
-            setLoading(false);
+            setAuthLoading(false);
         }
     };
     
@@ -429,6 +431,7 @@ const App = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center p-4 font-sans bg-gray-100">
+                <TailwindStyles />
                 <div className="text-center">
                     <svg className="animate-spin h-10 w-10 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -510,8 +513,8 @@ const App = () => {
                             </select>
                         )}
                     </div>
-                    <button type="submit" disabled={loading} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:transform-none shadow-lg">
-                        {loading ? 'Adding...' : 'Add Entry'}
+                    <button type="submit" disabled={authLoading} className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:transform-none shadow-lg">
+                        {authLoading ? 'Adding...' : 'Add Entry'}
                     </button>
                 </form>
                 <div className="mt-8">
