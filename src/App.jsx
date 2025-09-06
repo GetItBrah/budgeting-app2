@@ -3,7 +3,9 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, onSnapshot, collection, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
+// --- IMPORTANT ---
+// Ensure this configuration object is correct and has not been modified by a build process.
+// The "projectId" MUST be present here.
 const firebaseConfig = {
     apiKey: "AIzaSyAvBS8ejKNaAd8ssjE7jAriGhRtI7NkZcU",
     authDomain: "budget-56f02.firebaseapp.com",
@@ -181,6 +183,15 @@ const App = () => {
     const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
 
     useEffect(() => {
+        // --- FIX: Add validation to ensure the config is valid before initializing ---
+        if (!firebaseConfig || !firebaseConfig.projectId) {
+            const errorMessage = "Firebase config is invalid. Make sure projectId is provided in the firebaseConfig object.";
+            console.error(errorMessage);
+            setError(errorMessage);
+            setLoading(false); // Stop the loading spinner
+            return; // Halt execution
+        }
+
         try {
             const app = initializeApp(firebaseConfig);
             const firestore = getFirestore(app);
@@ -447,6 +458,19 @@ const App = () => {
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     <p className="mt-4 text-gray-700">Initializing app and authenticating user...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // --- NEW: Display Initialization Error on Screen ---
+    if (error && !userId) {
+         return (
+            <div className="min-h-screen flex items-center justify-center p-4 font-sans bg-gray-100">
+                <TailwindStyles />
+                <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 text-center">
+                    <h1 className="text-xl font-bold text-red-700 mb-4">Initialization Error</h1>
+                    <p className="text-gray-800 bg-red-100 p-4 rounded-xl">{error}</p>
                 </div>
             </div>
         );
