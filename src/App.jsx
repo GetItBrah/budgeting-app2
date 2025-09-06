@@ -58,8 +58,6 @@ const App = () => {
     const [modalType, setModalType] = useState('expense');
 
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const currentYear = new Date().getFullYear();
-    const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
 
     useEffect(() => {
         if (!firebaseConfig || !firebaseConfig.projectId) {
@@ -104,6 +102,23 @@ const App = () => {
         });
         return () => unsubscribe();
     }, [db, userId]);
+    
+    // --- NEW: Handlers for arrow navigation ---
+    const handlePreviousMonth = () => {
+        setSelectedDate(currentDate => {
+            const newDate = new Date(currentDate);
+            newDate.setMonth(newDate.getMonth() - 1);
+            return newDate;
+        });
+    };
+
+    const handleNextMonth = () => {
+        setSelectedDate(currentDate => {
+            const newDate = new Date(currentDate);
+            newDate.setMonth(newDate.getMonth() + 1);
+            return newDate;
+        });
+    };
 
     const handleLogin = async (e) => {
         e.preventDefault(); setAuthLoading(true); setMessage(null); setError(null);
@@ -279,13 +294,17 @@ const App = () => {
                 <button onClick={handleLogout} disabled={authLoading} className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg text-sm">Sign Out</button>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-4 mb-6">
-                <select value={selectedDate.getMonth()} onChange={(e) => setSelectedDate(new Date(selectedDate.getFullYear(), parseInt(e.target.value)))} className="p-3 rounded-xl border focus:ring-2 focus:ring-blue-500">
-                    {months.map((month, index) => (<option key={index} value={index}>{month}</option>))}
-                </select>
-                <select value={selectedDate.getFullYear()} onChange={(e) => setSelectedDate(new Date(parseInt(e.target.value), selectedDate.getMonth()))} className="p-3 rounded-xl border focus:ring-2 focus:ring-blue-500">
-                    {years.map((year) => (<option key={year} value={year}>{year}</option>))}
-                </select>
+            {/* --- UPDATED: Replaced dropdowns with arrow navigation --- */}
+            <div className="flex items-center justify-center gap-4 mb-6">
+                <button onClick={handlePreviousMonth} className="p-2 rounded-full hover:bg-gray-200 transition-colors" aria-label="Previous month">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <h2 className="text-xl font-semibold text-center w-48">
+                    {months[selectedDate.getMonth()]} {selectedDate.getFullYear()}
+                </h2>
+                <button onClick={handleNextMonth} className="p-2 rounded-full hover:bg-gray-200 transition-colors" aria-label="Next month">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                </button>
             </div>
 
             <div className="grid gap-4 sm:gap-6 mb-6 sm:grid-cols-1 md:grid-cols-3">
