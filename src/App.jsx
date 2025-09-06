@@ -167,6 +167,8 @@ const App = () => {
     const [type, setType] = useState('expense');
     const [isRecurring, setIsRecurring] = useState(false);
     const [recurrenceFrequency, setRecurrenceFrequency] = useState('monthly');
+    // --- NEW: State for the date input ---
+    const [transactionDate, setTransactionDate] = useState(new Date().toISOString().split('T')[0]);
 
     const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -286,7 +288,6 @@ const App = () => {
         const recurringItems = entries.filter(e => e.isRecurring);
 
         recurringItems.forEach(recurringItem => {
-            // Ensure recurring item has a valid timestamp before processing
             if (!recurringItem.timestamp?.toDate) return;
             
             let currentDate = recurringItem.timestamp.toDate();
@@ -299,7 +300,7 @@ const App = () => {
                     recurringForMonth.push({
                         ...recurringItem,
                         displayId: recurringItem.id + '-' + currentDate.getTime(),
-                        timestamp: new Date(currentDate), // FIX: Create a new Date object
+                        timestamp: new Date(currentDate),
                     });
                 }
 
@@ -338,10 +339,11 @@ const App = () => {
         }, 0);
     }, [displayedEntries]);
 
+    // --- UPDATED: handleAddEntry function ---
     const handleAddEntry = async (e) => {
         e.preventDefault();
-        if (!description || !amount || isNaN(parseFloat(amount))) {
-            setMessage("Please enter a valid description and amount.");
+        if (!description || !amount || isNaN(parseFloat(amount)) || !transactionDate) {
+            setMessage("Please enter a valid description, amount, and date.");
             return;
         }
         if (!db || !userId) {
@@ -349,32 +351,38 @@ const App = () => {
             return;
         }
 
+        // Use the selected date from the state. The `+ 'T00:00:00'` helps avoid timezone issues.
+        const entryDate = new Date(transactionDate + 'T00:00:00');
+
         const newEntry = {
             description,
             amount: parseFloat(amount),
             type,
             isRecurring,
-            timestamp: new Date(),
+            timestamp: entryDate,
         };
 
         if (isRecurring) {
             newEntry.recurrenceFrequency = recurrenceFrequency;
         }
 
-        setAuthLoading(true);
+        setAuthLoading(true); // Set loading to true before the try block
         setMessage(null);
 
         try {
             const collectionPath = `artifacts/${appId}/users/${userId}/budgetEntries`;
             await addDoc(collection(db, collectionPath), newEntry);
+            
+            // Reset form fields on success
             setDescription('');
             setAmount('');
+            setTransactionDate(new Date().toISOString().split('T')[0]); // Reset date to today
             setMessage("Entry added successfully!");
         } catch (e) {
             console.error("Error adding document: ", e);
             setMessage("Failed to add entry. Please try again.");
         } finally {
-            setAuthLoading(false);
+            setAuthLoading(false); // ALWAYS set loading to false after the operation
         }
     };
 
@@ -401,7 +409,7 @@ const App = () => {
             setAuthLoading(false);
         }
     };
-
+    
     const handleExportCSV = () => {
         const headers = ['Type', 'Description', 'Amount', 'Date', 'Recurring', 'Frequency'];
         const rows = displayedEntries.map(entry => [
@@ -414,7 +422,7 @@ const App = () => {
         ]);
 
         let csvContent = headers.join(',') + '\n' + rows.map(e => e.join(',')).join('\n');
-
+        
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
@@ -494,9 +502,11 @@ const App = () => {
                     <button onClick={handleExportCSV} className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">Export CSV</button>
                 </div>
                 <form onSubmit={handleAddEntry} className="flex flex-col gap-4">
+                    {/* --- UPDATED: Form now includes the date input --- */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description (e.g., Groceries)" className="flex-1 p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                        <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount" min="0" step="0.01" className="flex-1 p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount" min="0" step="0.01" className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" style={{width: '120px'}} />
+                        <input type="date" value={transactionDate} onChange={(e) => setTransactionDate(e.target.value)} className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
                     <div className="flex justify-center gap-4">
                         <button type="button" onClick={() => setType('income')} className={`flex-1 px-4 py-2 rounded-xl text-sm font-medium transition-colors duration-200 ${type === 'income' ? 'bg-green-500 text-white shadow-lg' : 'bg-green-100 text-green-700'}`}>Income</button>
