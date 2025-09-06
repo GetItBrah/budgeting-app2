@@ -8,6 +8,12 @@ import { getFirestore, doc, onSnapshot, collection, addDoc, updateDoc, deleteDoc
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
+// This component contains all the raw CSS needed for your app.
+const TailwindStyles = () => (
+    <style>{`
+    *,:after,:before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}body{margin:0;line-height:inherit}h1,h2,p,button,input,select,label,ul,li{margin:0;padding:0}button,[type=button],[type=reset],[type=submit]{-webkit-appearance:button;background-color:transparent;background-image:none}.bg-black{background-color:#000}.bg-gray-700{background-color:#374151}.bg-gray-800{background-color:#1f2937}.bg-gray-900{background-color:#111827}.bg-green-500{background-color:#22c55e}.bg-opacity-20{background-color:rgba(59,130,246,.2)}.bg-opacity-75{background-color:rgba(0,0,0,.75)}.bg-red-500{background-color:#ef4444}.hover\\:bg-gray-700:hover{background-color:#374151}.hover\\:bg-green-600:hover{background-color:#16a34a}.hover\\:bg-red-600:hover{background-color:#dc2626}.rounded-2xl{border-radius:1rem}.rounded-lg{border-radius:.5rem}.rounded-md{border-radius:.375rem}.border{border-width:1px}.border-gray-600{border-color:#4b5563}.p-2{padding:.5rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{top:0;right:0;bottom:0;left:0}.top-4{top:1rem}.right-4{right:1rem}.z-50{z-index:50}.mb-1{margin-bottom:.25rem}.mb-2{margin-bottom:.5rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.ml-4{margin-left:1rem}.mt-2{margin-top:.5rem}.mt-4{margin-top:1rem}.block{display:block}.flex{display:flex}.grid{display:grid}.h-10{height:2.5rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.min-h-screen{min-height:100vh}.w-10{width:2.5rem}.w-20{width:5rem}.w-28{width:7rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-full{width:100%}.max-w-4xl{max-width:56rem}.max-w-md{max-width:28rem}.max-w-sm{max-width:24rem}.flex-1{flex:1 1 0%}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.animate-spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:.25rem}.gap-2{gap:.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-y-3>:not([hidden])~:not([hidden]){margin-top:.75rem}.font-sans{font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,Noto Sans,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.text-blue-300{color:#93c5fd}.text-center{text-align:center}.text-gray-300{color:#d1d5db}.text-gray-400{color:#9ca3af}.text-gray-500{color:#6b7280}.text-green-400{color:#4ade80}.text-red-300{color:#fca5a5}.text-red-400{color:#f87171}.text-white{color:#fff}.hover\\:text-red-400:hover{color:#f87171}.hover\\:text-white:hover{color:#fff}.shadow-lg{box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05)}.shadow-xl{box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.duration-300{transition-duration:.3s}.hover\\:scale-105:hover{--tw-scale-x:1.05;--tw-scale-y:1.05;transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\\:underline:hover{text-decoration-line:underline}.disabled\\:bg-gray-500:disabled{background-color:#6b7280}.disabled\\:transform-none:disabled{transform:none}.focus\\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.focus\\:ring-green-400:focus{--tw-ring-color:#4ade80}.opacity-25{opacity:.25}.opacity-75{opacity:.75}@media (min-width:640px){.sm\\:flex-row{flex-direction:row}.sm\\:p-6{padding:1.5rem}.sm\\:mt-0{margin-top:0}.sm\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}@media (min-width:1024px){.lg\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    `}</style>
+  );
 
 const App = () => {
     // Firebase State
@@ -253,6 +259,7 @@ const App = () => {
     if (loading) {
         return (
             <div className="bg-gray-900 min-h-screen flex items-center justify-center text-white">
+                <TailwindStyles />
                 <svg className="animate-spin h-10 w-10 text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
             </div>
         );
@@ -376,7 +383,7 @@ const App = () => {
     // Main render
     return (
         <div className="min-h-screen bg-gray-900 text-white font-sans flex items-center justify-center">
-            <script src="https://cdn.tailwindcss.com"></script>
+            <TailwindStyles />
             {userId ? renderApp() : renderLogin()}
         </div>
     );
@@ -398,5 +405,4 @@ const TransactionItem = ({ entry, onDelete }) => (
 );
 
 export default App;
-
 
