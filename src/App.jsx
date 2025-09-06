@@ -167,7 +167,6 @@ const App = () => {
     const [type, setType] = useState('expense');
     const [isRecurring, setIsRecurring] = useState(false);
     const [recurrenceFrequency, setRecurrenceFrequency] = useState('monthly');
-    // --- NEW: State for the date input ---
     const [transactionDate, setTransactionDate] = useState(new Date().toISOString().split('T')[0]);
 
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -339,10 +338,9 @@ const App = () => {
         }, 0);
     }, [displayedEntries]);
 
-    // --- UPDATED: handleAddEntry function ---
     const handleAddEntry = async (e) => {
         e.preventDefault();
-        if (!description || !amount || isNaN(parseFloat(amount)) || !transactionDate) {
+        if (!description || transactionDate === '' || amount === '' || isNaN(parseFloat(amount))) {
             setMessage("Please enter a valid description, amount, and date.");
             return;
         }
@@ -351,8 +349,7 @@ const App = () => {
             return;
         }
 
-        // Use the selected date from the state. The `+ 'T00:00:00'` helps avoid timezone issues.
-        const entryDate = new Date(transactionDate + 'T00:00:00');
+        const entryDate = new Date(transactionDate.replace(/-/g, '/'));
 
         const newEntry = {
             description,
@@ -366,23 +363,22 @@ const App = () => {
             newEntry.recurrenceFrequency = recurrenceFrequency;
         }
 
-        setAuthLoading(true); // Set loading to true before the try block
+        setAuthLoading(true);
         setMessage(null);
 
         try {
             const collectionPath = `artifacts/${appId}/users/${userId}/budgetEntries`;
             await addDoc(collection(db, collectionPath), newEntry);
             
-            // Reset form fields on success
             setDescription('');
             setAmount('');
-            setTransactionDate(new Date().toISOString().split('T')[0]); // Reset date to today
+            setTransactionDate(new Date().toISOString().split('T')[0]);
             setMessage("Entry added successfully!");
         } catch (e) {
             console.error("Error adding document: ", e);
             setMessage("Failed to add entry. Please try again.");
         } finally {
-            setAuthLoading(false); // ALWAYS set loading to false after the operation
+            setAuthLoading(false);
         }
     };
 
@@ -502,7 +498,6 @@ const App = () => {
                     <button onClick={handleExportCSV} className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">Export CSV</button>
                 </div>
                 <form onSubmit={handleAddEntry} className="flex flex-col gap-4">
-                    {/* --- UPDATED: Form now includes the date input --- */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description (e.g., Groceries)" className="flex-1 p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Amount" min="0" step="0.01" className="p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" style={{width: '120px'}} />
