@@ -140,15 +140,15 @@ const TailwindStyles = () => (
     .hover\\:text-red-700:hover { color: #b91c1c; }
     
     @media (min-width: 640px) {
-      .sm\\:p-8 { padding: 2rem; }
-      .sm\\:p-6 { padding: 1.5rem; }
-      .sm\\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-      .sm\\:text-2xl { font-size: 1.5rem; line-height: 2rem; }
-      .sm\\:flex-row { flex-direction: row; }
-      .sm\\:w-auto { width: auto; }
+        .sm\\:p-8 { padding: 2rem; }
+        .sm\\:p-6 { padding: 1.5rem; }
+        .sm\\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+        .sm\\:text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .sm\\:flex-row { flex-direction: row; }
+        .sm\\:w-auto { width: auto; }
     }
     @media (min-width: 1024px) {
-      .lg\\:p-8 { padding: 2rem; }
+        .lg\\:p-8 { padding: 2rem; }
     }
     `}</style>
 );
@@ -276,12 +276,19 @@ const App = () => {
             .filter(entry => {
                 const entryDate = entry.timestamp.toDate();
                 return entryDate >= startOfMonth && entryDate <= endOfMonth;
-            });
+            })
+            .map(entry => ({
+                ...entry,
+                timestamp: entry.timestamp.toDate()
+            }));
 
         const recurringForMonth = [];
         const recurringItems = entries.filter(e => e.isRecurring);
 
         recurringItems.forEach(recurringItem => {
+            // Ensure recurring item has a valid timestamp before processing
+            if (!recurringItem.timestamp?.toDate) return;
+            
             let currentDate = recurringItem.timestamp.toDate();
             const cancellationDate = recurringItem.cancellationDate?.toDate ? recurringItem.cancellationDate.toDate() : null;
 
@@ -292,7 +299,7 @@ const App = () => {
                     recurringForMonth.push({
                         ...recurringItem,
                         displayId: recurringItem.id + '-' + currentDate.getTime(),
-                        timestamp: currentDate,
+                        timestamp: new Date(currentDate), // FIX: Create a new Date object
                     });
                 }
 
@@ -354,9 +361,7 @@ const App = () => {
             newEntry.recurrenceFrequency = recurrenceFrequency;
         }
 
-        // Changed setLoading to true only for the async operation
-        const tempLoading = true;
-        setAuthLoading(tempLoading); // Use authLoading for form submission
+        setAuthLoading(true);
         setMessage(null);
 
         try {
@@ -369,7 +374,7 @@ const App = () => {
             console.error("Error adding document: ", e);
             setMessage("Failed to add entry. Please try again.");
         } finally {
-            setAuthLoading(false); // Reset the form loading state
+            setAuthLoading(false);
         }
     };
 
@@ -396,7 +401,7 @@ const App = () => {
             setAuthLoading(false);
         }
     };
-    
+
     const handleExportCSV = () => {
         const headers = ['Type', 'Description', 'Amount', 'Date', 'Recurring', 'Frequency'];
         const rows = displayedEntries.map(entry => [
@@ -409,7 +414,7 @@ const App = () => {
         ]);
 
         let csvContent = headers.join(',') + '\n' + rows.map(e => e.join(',')).join('\n');
-        
+
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
@@ -522,7 +527,7 @@ const App = () => {
                     <ul className="space-y-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                         {displayedEntries.length > 0 ? (
                             displayedEntries.map((entry) => (
-                                <li key={entry.displayId} className="flex items-center justify-between bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200 transition-transform duration-200 transform hover:scale-[1.01]">
+                                <li key={entry.displayId || entry.id} className="flex items-center justify-between bg-gray-50 p-4 rounded-xl shadow-sm border border-gray-200 transition-transform duration-200 transform hover:scale-[1.01]">
                                     <div className="flex-1">
                                         <p className="font-medium text-gray-800">{entry.description}{entry.isRecurring && <span className="text-xs ml-2 text-gray-400">(Recurring)</span>}</p>
                                         <p className="text-sm text-gray-500">{entry.timestamp?.toLocaleDateString()}</p>
