@@ -5,7 +5,7 @@ const DashboardView = ({
     userEmail, onSettingsClick, onLogout,
     selectedDate, months, handlePreviousMonth, handleNextMonth, handlePreviousYear, handleNextYear,
     totalIncome, totalExpenses, balance, formatCurrency,
-    onAddIncome, onAddExpense, onExportCSV, onExportPDF, // Add onExportPDF
+    onAddIncome, onAddExpense, onExportCSV, onExportPDF,
     payPeriodSettings, currentPayPeriod, handlePreviousPayPeriod, handleNextPayPeriod,
     upcomingBills, handleOpenPayModal, totalUpcomingBills,
     paidBillsThisPayPeriod, handleUnpayBill, totalPaidBills,
@@ -21,7 +21,8 @@ const DashboardView = ({
                 <h1 className="text-3xl font-bold text-gray-200">Budget Dashboard</h1>
                 <p className="text-sm text-gray-400">Signed in as: {userEmail || 'N/A'}</p>
             </div>
-            <div className="flex items-center gap-2">
+            {/* --- HIDE ON MOBILE --- */}
+            <div className="hidden md:flex items-center gap-2">
                 <button 
                     onClick={onSettingsClick} 
                     className="p-2 rounded-full hover:bg-gray-700 transition-colors" 
@@ -66,7 +67,7 @@ const DashboardView = ({
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gray-900 px-4 py-2 rounded-xl shadow-md flex flex-col justify-center text-center">
+                 <div className="bg-gray-900 px-4 py-2 rounded-xl shadow-md flex flex-col justify-center text-center">
                     <span className="text-base font-semibold text-gray-400 leading-tight">Income</span>
                     <span className="text-xl font-bold text-green-400 leading-tight">{formatCurrency(totalIncome)}</span>
                 </div>
